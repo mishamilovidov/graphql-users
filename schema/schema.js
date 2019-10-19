@@ -35,8 +35,8 @@ const UserType = new GraphQLObjectType({
     age: { type: GraphQLInt },
     company: {
       type: CompanyType,
-      resolve: async (parentValue, args) => {
-        let res = await axios.get(`${BASE_URL}/companies/${parentValue.companyId}`);
+      resolve: async ({ companyId }, args) => {
+        let res = await axios.get(`${BASE_URL}/companies/${companyId}`);
 
         return res.data;
       }
@@ -91,6 +91,20 @@ const mutation = new GraphQLObjectType({
       },
       resolve: async (parentValue, { id }) => {
         let res = await axios.delete(`${BASE_URL}/users/${id}`);
+
+        return res.data;
+      }
+    },
+    editUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+        firstName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        companyId: { type: GraphQLString },
+      },
+      resolve: async (parentValue, args) => {
+        let res = axios.patch(`${BASE_URL}/users/${args.id}`, args);
 
         return res.data;
       }
