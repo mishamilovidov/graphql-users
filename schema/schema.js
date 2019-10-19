@@ -104,7 +104,7 @@ const mutation = new GraphQLObjectType({
         companyId: { type: GraphQLString },
       },
       resolve: async (parentValue, args) => {
-        let res = axios.patch(`${BASE_URL}/users/${args.id}`, args);
+        let res = await axios.patch(`${BASE_URL}/users/${args.id}`, args);
 
         return res.data;
       }
