@@ -5,8 +5,10 @@ const {
   GraphQLString,
   GraphQLInt,
   GraphQLSchema,
-  GraphQLList
+  GraphQLList,
+  GraphQLNonNull
 } = graphql;
+const BASE_URL = 'http://localhost:3000';
 
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
@@ -17,7 +19,7 @@ const CompanyType = new GraphQLObjectType({
     users: {
       type: new GraphQLList(UserType),
       resolve: async (parentValue, args) => {
-        let res = await axios.get(`http://localhost:3000/companies/${parentValue.id}/users`);
+        let res = await axios.get(`${BASE_URL}/companies/${parentValue.id}/users`);
 
         return res.data;
       }
@@ -34,7 +36,7 @@ const UserType = new GraphQLObjectType({
     company: {
       type: CompanyType,
       resolve: async (parentValue, args) => {
-        let res = await axios.get(`http://localhost:3000/companies/${parentValue.companyId}`);
+        let res = await axios.get(`${BASE_URL}/companies/${parentValue.companyId}`);
 
         return res.data;
       }
@@ -49,7 +51,7 @@ const RootQuery = new GraphQLObjectType({
       type: UserType,
       args: { id: { type: GraphQLString } },
       resolve: async (parentValue, args) => {
-        let res = await axios.get(`http://localhost:3000/users/${args.id}`);
+        let res = await axios.get(`${BASE_URL}/users/${args.id}`);
 
         return res.data;
       }
@@ -58,7 +60,26 @@ const RootQuery = new GraphQLObjectType({
       type: CompanyType,
       args: { id: { type: GraphQLString } },
       resolve: async (parentValue, args) => {
-        let res = await axios.get(`http://localhost:3000/companies/${args.id}`);
+        let res = await axios.get(`${BASE_URL}/companies/${args.id}`);
+
+        return res.data;
+      }
+    }
+  }
+});
+
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addUser: {
+      type: UserType,
+      args: {
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: new GraphQLNonNull(GraphQLInt) },
+        companyId: { type: GraphQLString },
+      },
+      resolve: async (parentValue, { firstName, age }) => {
+        let res = await axios.post(`${BASE_URL}/users`, { firstName, age });
 
         return res.data;
       }
@@ -67,5 +88,6 @@ const RootQuery = new GraphQLObjectType({
 });
 
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation
 });
