@@ -18,8 +18,8 @@ const CompanyType = new GraphQLObjectType({
     description: { type: GraphQLString },
     users: {
       type: new GraphQLList(UserType),
-      resolve: async (parentValue, args) => {
-        let res = await axios.get(`${BASE_URL}/companies/${parentValue.id}/users`);
+      resolve: async ({ id }, args) => {
+        let res = await axios.get(`${BASE_URL}/companies/${id}/users`);
 
         return res.data;
       }
